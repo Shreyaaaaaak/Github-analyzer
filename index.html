@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GitHub Analyzer</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <div class="hero fade-in">
+      <div class="badge">✦ GitHub Profile Explorer</div>
+      <h1>Analyze any <span>GitHub</span> profile</h1>
+      <p class="subtitle">Repos, languages, and stats — beautifully visualized in seconds</p>
+
+      <div class="search-box">
+        <input type="text" id="username" placeholder="Enter GitHub username..." />
+        <button onclick="analyze()">Analyze →</button>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features fade-in fade-in-delay">
+      <div class="feat-card">
+        <div class="feat-title">Profile Overview</div>
+        <div class="feat-desc">Followers, repos, bio and account details at a glance</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-title">Language Breakdown</div>
+        <div class="feat-desc">Visual chart of languages across all public repos</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-title">Top Repositories</div>
+        <div class="feat-desc">Ranked by stars with forks and descriptions shown</div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- SAMPLE LABEL -->
+    <p class="preview-label fade-in fade-in-delay-2">Sample Profiles</p>
+
+    <!-- SAMPLE CARDS -->
+    <div class="sample-cards fade-in fade-in-delay-2">
+
+      <!-- Card 1 -->
+      <div class="sample-card">
+        <div class="sample-head">
+          <img src="https://avatars.githubusercontent.com/u/1024025?v=4" />
+          <div>
+            <div class="sample-name">Linus Torvalds</div>
+            <div class="sample-handle">@torvalds</div>
+          </div>
+        </div>
+
+        <div class="sample-stats">
+          <div><div class="sv">298k</div><div class="sl">Followers</div></div>
+          <div><div class="sv">11</div><div class="sl">Repos</div></div>
+          <div><div class="sv">0</div><div class="sl">Following</div></div>
+        </div>
+
+        <div class="sample-bar-label">Top language · C</div>
+        <div class="bar-track"><div class="bar-fill" style="width:90%"></div></div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="sample-card">
+        <div class="sample-head">
+          <img src="https://avatars.githubusercontent.com/u/810438?v=4" />
+          <div>
+            <div class="sample-name">Dan Abramov</div>
+            <div class="sample-handle">@gaearon</div>
+          </div>
+        </div>
+
+        <div class="sample-stats">
+          <div><div class="sv">87k</div><div class="sl">Followers</div></div>
+          <div><div class="sv">249</div><div class="sl">Repos</div></div>
+          <div><div class="sv">171</div><div class="sl">Following</div></div>
+        </div>
+
+        <div class="sample-bar-label">Top language · JavaScript</div>
+        <div class="bar-track"><div class="bar-fill" style="width:80%"></div></div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="sample-card">
+        <div class="sample-head">
+          <img src="https://avatars.githubusercontent.com/u/9919?v=4" />
+          <div>
+            <div class="sample-name">GitHub</div>
+            <div class="sample-handle">@github</div>
+          </div>
+        </div>
+
+        <div class="sample-stats">
+          <div><div class="sv">22k</div><div class="sl">Followers</div></div>
+          <div><div class="sv">432</div><div class="sl">Repos</div></div>
+          <div><div class="sv">0</div><div class="sl">Following</div></div>
+        </div>
+
+        <div class="sample-bar-label">Top language · Ruby</div>
+        <div class="bar-track"><div class="bar-fill" style="width:65%"></div></div>
+      </div>
+
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader" class="hidden">
+      <div class="spinner"></div>
+      <p>Fetching profile...</p>
+    </div>
+
+    <!-- ERROR -->
+    <div id="error" class="hidden error-msg"></div>
+
+    <!-- RESULTS -->
+    <div id="results" class="hidden">
+
+      <hr class="divider" />
+
+      <!-- PROFILE -->
+      <div class="profile-card">
+        <img id="avatar" src="" alt="avatar" />
+
+        <div class="profile-info">
+          <div class="name-row">
+            <h2 id="name"></h2>
+            <span id="login-badge"></span>
+          </div>
+
+          <p id="bio"></p>
+
+          <div class="meta-info">
+            <span id="location-info" class="hidden">📍 <span id="location"></span></span>
+            <span id="company-info" class="hidden">🏢 <span id="company"></span></span>
+            <span id="blog-info" class="hidden">🔗 <a id="blog" href="" target="_blank"></a></span>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><span id="followers"></span><label>Followers</label></div>
+            <div class="stat"><span id="following"></span><label>Following</label></div>
+            <div class="stat"><span id="repos"></span><label>Repos</label></div>
+            <div class="stat"><span id="gists"></span><label>Gists</label></div>
+          </div>
+
+          <a id="github-link" href="" target="_blank" class="gh-button">
+            View on GitHub →
+          </a>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts">
+        <div class="chart-box">
+          <h3>Top Languages</h3>
+          <canvas id="langChart"></canvas>
+          <p id="no-lang" class="hidden muted">No language data available.</p>
+        </div>
+
+        <div class="chart-box">
+          <h3>Top Repositories <span class="muted">(by stars)</span></h3>
+          <div id="repo-list"></div>
+        </div>
+      </div>
+
+      <p class="footer-note">Data sourced from the GitHub REST API</p>
+
+    </div>
+
+  </div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+
+</body>
+</html>
